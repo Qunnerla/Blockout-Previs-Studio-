@@ -1,0 +1,8 @@
+Blockout Previs Studio — GitHub Pages
+
+1. Upload the CONTENTS of this folder to the repository root, alongside the existing index.html. Replace index.html. Keep the icons subfolder.
+2. Required: index.html, manifest.webmanifest, favicon.ico, icons/ (4 PNG files).
+3. Wait for GitHub Pages deployment, then reload the existing website.
+4. Create a new shortcut/install the app again if the old shortcut retains its previous icon. Do not clear site data: it contains locally saved projects. Export important projects as JSON before removing an installed app, and leave any option to delete site data unchecked.
+
+All icon URLs are relative, including support for /Blockout-Previs-Studio-/. The site URL and local project storage keys are unchanged. No service worker or cloud storage is added.

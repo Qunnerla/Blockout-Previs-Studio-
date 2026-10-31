@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "Blockout Previs Studio",
+  "short_name": "Blockout",
+  "description": "3D blockout, camera planning and previs",
+  "lang": "th",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#111214",
+  "theme_color": "#FFB21C",
+  "icons": [
+    {
+      "src": "./icons/bp-192-v2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/bp-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
