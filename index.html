@@ -1,4 +1,4 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blockout Previs Studio</title><meta name="application-name" content="Blockout Previs Studio"><meta name="theme-color" content="#FFB21C"><link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 256x256" href="./favicon.ico?v=2"><link rel="icon" type="image/png" sizes="32x32" href="./icons/bp-32-v2.png"><link rel="apple-touch-icon" sizes="180x180" href="./icons/bp-180-v2.png"><link rel="manifest" href="./manifest.webmanifest?v=2"></head><body data-studio-version="2026.10.31.4"><section id="bpSplash" aria-label="Blockout Previs Studio กำลังเริ่มโปรแกรม" aria-busy="true">
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blockout Previs Studio</title><meta name="application-name" content="Blockout Previs Studio"><meta name="theme-color" content="#FFB21C"><link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 256x256" href="./favicon.ico?v=3"><link rel="icon" type="image/png" sizes="32x32" href="./icons/bp-32-v3.png"><link rel="apple-touch-icon" sizes="180x180" href="./icons/bp-180-v3.png"><link rel="manifest" href="./manifest.webmanifest?v=3"></head><body data-studio-version="2026.10.31.4"><section id="bpSplash" aria-label="Blockout Previs Studio กำลังเริ่มโปรแกรม" aria-busy="true">
   <div class="bp-splash-card">
     <div class="bp-splash-brand">
       <h1><span>Blockout</span><span>Previs Studio</span></h1>
@@ -8711,7 +8711,7 @@ function initDocks() {
   window.addEventListener('keydown', e => { if (dockMenu && e.key === 'Escape') { e.stopImmediatePropagation(); closeDockMenu(); } }, true);
   applyLayout();
 }
-const BP_LOGO_MARKUP="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 256\" role=\"img\" aria-label=\"BP · Blockout Previs Studio\">\n  <rect width=\"256\" height=\"256\" rx=\"42\" fill=\"#FFB21C\"/>\n  <g transform=\"translate(-5 0)\" fill=\"#FFF2C6\" fill-rule=\"evenodd\">\n    <path d=\"M48 70H87C109 70 121 81 121 98C121 111 115 120 105 124C118 128 125 137 125 151C125 172 111 184 87 184H48V70ZM70 90V115H85C95 115 100 110 100 102C100 94 95 90 85 90H70ZM70 135V164H85C97 164 103 159 103 149C103 140 97 135 85 135H70Z\"/>\n    <path d=\"M143 70H179C204 70 217 84 217 105C217 128 202 140 179 140H165V184H143V70ZM165 90V120H178C189 120 195 115 195 105C195 95 190 90 178 90H165Z\"/>\n  </g>\n</svg>";
+const BP_LOGO_MARKUP="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 256\" role=\"img\" aria-label=\"BP · Blockout Previs Studio\">\n  <rect width=\"256\" height=\"256\" rx=\"58\" fill=\"#FFB21C\"/>\n  <g transform=\"translate(-5 0)\" fill=\"#FFF2C6\" fill-rule=\"evenodd\">\n    <path d=\"M48 70H87C109 70 121 81 121 98C121 111 115 120 105 124C118 128 125 137 125 151C125 172 111 184 87 184H48V70ZM70 90V115H85C95 115 100 110 100 102C100 94 95 90 85 90H70ZM70 135V164H85C97 164 103 159 103 149C103 140 97 135 85 135H70Z\"/>\n    <path d=\"M143 70H179C204 70 217 84 217 105C217 128 202 140 179 140H165V184H143V70ZM165 90V120H178C189 120 195 115 195 105C195 95 190 90 178 90H165Z\"/>\n  </g>\n</svg>";
 /* Composition workflow and context creation commands, adapted to this engine. */
 function initAEBasics(host) {
   const FPS=[24,25,30,60], previewScales=[1,.5,.25];
@@ -8976,23 +8976,30 @@ window.CLIP = { block:{create:blockCreate,open:blockOpen,cancel:blockCancel},cam
 <script>(async () => {
   const boot=window.BPBoot;
   const paint=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  const minimumDuration=10000;
+  const hold=async(start,duration)=>{const remaining=duration-(performance.now()-start);if(remaining>0)await new Promise(resolve=>setTimeout(resolve,remaining));};
   try {
     await paint();
     const scripts=[...document.querySelectorAll('script[type="text/bp-startup"]')];
+    const stageDuration=minimumDuration/(scripts.length+2);
     for(let index=0;index<scripts.length;index++){
       if(boot.failed)return;
       const template=scripts[index],source=template.getAttribute('data-bundled-source')||'';
       const message=source.includes('three.min')?'Loading 3D engine…':source.includes('OrbitControls')?'Initializing camera controls…':source.includes('TransformControls')?'Initializing move, rotate and scale tools…':source.includes('Reflector')?'Preparing scene materials…':source.includes('mp4-muxer')?'Preparing video output…':index===5?'Loading project and scene…':'Preparing workspace…';
+      const stageStarted=performance.now();
       boot.step(Math.round(8+index/scripts.length*68),message);await paint();
       const script=document.createElement('script');script.dataset.bpRuntime='true';script.textContent=template.textContent;document.body.append(script);script.remove();
       if(boot.failed)return;
+      await hold(stageStarted,stageDuration);
     }
+    const workspaceStarted=performance.now();
     boot.step(86,'Building workspace…');await paint();
     if(typeof boot.onEngineReady!=='function')throw Error('Workspace initialization is unavailable');
     boot.onEngineReady();await paint();
     if(!window.CLIP||!document.querySelector('#gl')?.width||!document.getElementById('aeHome'))throw Error('Workspace did not finish initialization');
+    await hold(workspaceStarted,stageDuration);
     boot.ready=true;boot.step(100,'Ready');await paint();
-    const remaining=1400-(performance.now()-boot.started);if(remaining>0)await new Promise(resolve=>setTimeout(resolve,remaining));
+    await hold(boot.started,minimumDuration);
     if(boot.failed)return;
     document.body.classList.remove('bp-booting');const root=document.getElementById('bpSplash');root.setAttribute('aria-busy','false');root.classList.add('leaving');boot.active=false;
     await new Promise(resolve=>setTimeout(resolve,matchMedia('(prefers-reduced-motion: reduce)').matches?0:240));root.remove();
